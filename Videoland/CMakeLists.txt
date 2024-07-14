@@ -6,3 +6,4 @@ add_library(Videoland STATIC
 
 target_include_directories(Videoland PUBLIC ..)
 target_link_libraries(Videoland glfw volk)
+target_compile_features(Videoland PUBLIC cxx_std_20)
