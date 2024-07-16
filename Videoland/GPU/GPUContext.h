@@ -1,13 +1,13 @@
 #pragma once
 
-#include <volk.h>
 #include <GLFW/glfw3.h>
+#include <volk.h>
 
 namespace Videoland {
 class GPUContext {
 public:
     GPUContext() = default;
-    GPUContext(GLFWwindow *window);
+    GPUContext(GLFWwindow* window);
 
     ~GPUContext();
 
@@ -16,5 +16,7 @@ public:
 
 private:
     VkInstance m_instance{VK_NULL_HANDLE};
+    VkDebugUtilsMessengerEXT m_debug_messenger{VK_NULL_HANDLE};
+    VkSurfaceKHR m_surface{VK_NULL_HANDLE};
 };
 }
