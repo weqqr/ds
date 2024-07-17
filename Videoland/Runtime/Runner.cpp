@@ -16,8 +16,15 @@ void Runner::run() {
 
     Renderer renderer{window};
 
-    while (!glfwWindowShouldClose(window)) {
+    bool close_requested = false;
+
+    while (!glfwWindowShouldClose(window) && !close_requested) {
         glfwPollEvents();
+
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+            close_requested = true;
+        }
+
         renderer.render_frame();
     }
 
