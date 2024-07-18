@@ -4,3 +4,6 @@
 [submodule "Vendor/volk"]
 	path = Vendor/volk
 	url = https://github.com/zeux/volk
+[submodule "Vendor/luau"]
+	path = Vendor/luau
+	url = https://github.com/luau-lang/luau
