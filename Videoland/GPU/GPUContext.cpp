@@ -212,7 +212,7 @@ SurfaceInfo query_surface_info(const Adapter& adapter, VkSurfaceKHR surface) {
     return info;
 }
 
-void Swapchain::create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent, const Adapter &adapter, const SurfaceInfo& surface_info) {
+void Swapchain::create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent, const Adapter& adapter, const SurfaceInfo& surface_info) {
     m_device = device;
 
     VkSwapchainCreateInfoKHR create_info = {
@@ -235,18 +235,53 @@ void Swapchain::create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent,
     };
 
     VK_CHECK(vkCreateSwapchainKHR(device, &create_info, nullptr, &m_swapchain));
+
+    uint32_t image_count = 0;
+    vkGetSwapchainImagesKHR(m_device, m_swapchain, &image_count, nullptr);
+    m_images.resize(image_count);
+    vkGetSwapchainImagesKHR(m_device, m_swapchain, &image_count, m_images.data());
+
+    m_image_views.resize(image_count);
+    for (size_t i = 0; i < m_images.size(); i++) {
+        VkImageViewCreateInfo image_view_create_info = {
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            .image = m_images[i],
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = surface_info.preferred_format.format,
+            .components = VkComponentMapping{
+                .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+            },
+            .subresourceRange = VkImageSubresourceRange{
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
+        };
+
+        vkCreateImageView(m_device, &image_view_create_info, nullptr, &m_image_views[i]);
+    }
 }
 
 void Swapchain::destroy() {
-    if (m_device && m_swapchain)
+    for (auto image_view : m_image_views) {
+        vkDestroyImageView(m_device, image_view, nullptr);
+    }
+
+    if (m_device && m_swapchain) {
         vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+    }
 }
 
 void Swapchain::recreate() {
     // can't recreate swapchain while there are frames in flight
     vkDeviceWaitIdle(m_device);
 
-    // TODO
+    // create();
 }
 
 GPUContext::GPUContext(GLFWwindow* window) {
@@ -278,14 +313,17 @@ GPUContext::~GPUContext() {
 
     m_swapchain.destroy();
 
-    if (m_device)
+    if (m_device) {
         vkDestroyDevice(m_device, nullptr);
+    }
 
-    if (m_surface)
+    if (m_surface) {
         vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+    }
 
-    if (m_debug_messenger)
+    if (m_debug_messenger) {
         vkDestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
+    }
 
     vkDestroyInstance(m_instance, nullptr);
 }

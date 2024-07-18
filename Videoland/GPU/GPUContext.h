@@ -19,6 +19,12 @@ struct SurfaceInfo {
     VkSurfaceFormatKHR preferred_format{};
 };
 
+struct SwapchainImage {
+    VkImage image;
+    VkImageView image_view;
+    uint32_t index;
+};
+
 class Swapchain {
     NO_COPY(Swapchain)
 
@@ -33,8 +39,12 @@ private:
     void destroy();
     void recreate();
 
+    void acquire_image();
+
     VkDevice m_device{VK_NULL_HANDLE};
     VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
+    std::vector<VkImage> m_images{};
+    std::vector<VkImageView> m_image_views{};
 };
 
 class GPUContext {
