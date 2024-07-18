@@ -4,7 +4,7 @@
 #include <Videoland/Common/Assert.h>
 
 namespace Videoland::Impl {
-void fatal_panic(const char* file, int line, const char* function, const char* message) {
+void FatalPanic(const char* file, int line, const char* function, const char* message) {
     std::cout << std::endl
               << "---" << std::endl
               << "panic: " << message << std::endl

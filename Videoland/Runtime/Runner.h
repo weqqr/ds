@@ -3,7 +3,7 @@
 namespace Videoland {
 class Runner {
 public:
-    void run();
+    void Run();
 
 private:
 };

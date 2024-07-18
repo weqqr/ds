@@ -10,18 +10,18 @@ namespace Videoland {
 struct Adapter {
     VkPhysicalDevice device{VK_NULL_HANDLE};
     std::string name{};
-    uint32_t graphics_compute_queue_index{VK_QUEUE_FAMILY_IGNORED};
+    uint32_t graphicsComputeQueueIndex{VK_QUEUE_FAMILY_IGNORED};
 };
 
 struct SurfaceInfo {
     VkSurfaceCapabilitiesKHR capabilities{};
     std::vector<VkSurfaceFormatKHR> formats{};
-    VkSurfaceFormatKHR preferred_format{};
+    VkSurfaceFormatKHR preferredFormat{};
 };
 
 struct SwapchainImage {
     VkImage image;
-    VkImageView image_view;
+    VkImageView imageView;
     uint32_t index;
 };
 
@@ -35,16 +35,16 @@ public:
     Swapchain() = default;
 
 private:
-    void create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent, const Adapter &adapter, const SurfaceInfo& surface_info);
-    void destroy();
-    void recreate();
+    void Create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent, const Adapter &adapter, const SurfaceInfo& surface_info);
+    void Destroy();
+    void Recreate();
 
-    void acquire_image();
+    void AcquireImage();
 
     VkDevice m_device{VK_NULL_HANDLE};
     VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
     std::vector<VkImage> m_images{};
-    std::vector<VkImageView> m_image_views{};
+    std::vector<VkImageView> m_imageViews{};
 };
 
 class GPUContext {
@@ -57,11 +57,11 @@ public:
 
 private:
     VkInstance m_instance{VK_NULL_HANDLE};
-    VkDebugUtilsMessengerEXT m_debug_messenger{VK_NULL_HANDLE};
+    VkDebugUtilsMessengerEXT m_debugMessenger{VK_NULL_HANDLE};
     VkSurfaceKHR m_surface{VK_NULL_HANDLE};
     Adapter m_adapter{};
     VkDevice m_device{VK_NULL_HANDLE};
-    VkQueue m_graphics_compute_queue{VK_NULL_HANDLE};
+    VkQueue m_graphicsComputeQueue{VK_NULL_HANDLE};
     Swapchain m_swapchain{};
 };
 }

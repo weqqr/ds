@@ -6,7 +6,7 @@ namespace Videoland {
 class Renderer {
 public:
     Renderer(GLFWwindow* window);
-    void render_frame();
+    void RenderFrame();
 
 private:
     GPUContext m_context{};

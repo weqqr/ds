@@ -3,7 +3,7 @@
 #include <Videoland/Runtime/Runner.h>
 
 namespace Videoland {
-void Runner::run() {
+void Runner::Run() {
     if (!glfwInit()) {
         return;
     }
@@ -16,16 +16,16 @@ void Runner::run() {
 
     Renderer renderer{window};
 
-    bool close_requested = false;
+    bool closeRequested = false;
 
-    while (!glfwWindowShouldClose(window) && !close_requested) {
+    while (!glfwWindowShouldClose(window) && !closeRequested) {
         glfwPollEvents();
 
         if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-            close_requested = true;
+            closeRequested = true;
         }
 
-        renderer.render_frame();
+        renderer.RenderFrame();
     }
 
     glfwTerminate();

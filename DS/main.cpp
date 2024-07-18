@@ -2,5 +2,5 @@
 
 int main() {
     Videoland::Runner runner{};
-    runner.run();
+    runner.Run();
 }
