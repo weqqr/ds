@@ -1,5 +1,5 @@
 add_library(Videoland STATIC
-    Common/Assert.cpp
+    Common/Verify.cpp
     GPU/GPUContext.cpp
     Renderer/Renderer.cpp
     Runtime/Runner.cpp

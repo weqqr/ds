@@ -1,5 +1,5 @@
 #include <Luau/Compiler.h>
-#include <Videoland/Common/Assert.h>
+#include <Videoland/Common/Verify.h>
 #include <Videoland/Script/ScriptContext.h>
 #include <fstream>
 #include <iostream>

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include <Videoland/Common/Assert.h>
+#include <Videoland/Common/Verify.h>
 
 namespace Videoland::Impl {
 void FatalPanic(const char* file, int line, const char* function, const char* message) {
