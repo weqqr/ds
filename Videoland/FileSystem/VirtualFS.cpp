@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <filesystem>
 
 namespace Videoland {
 VirtualFS::VirtualFS(const std::string& rootPath)
@@ -10,7 +11,9 @@ VirtualFS::VirtualFS(const std::string& rootPath)
 }
 
 std::string VirtualFS::ReadToString(const std::string& path) const {
-    std::ifstream input(path);
+    auto full_path = std::filesystem::path(m_rootPath) / path;
+
+    std::ifstream input(full_path);
     VERIFY(input.is_open());
 
     std::stringstream buffer;

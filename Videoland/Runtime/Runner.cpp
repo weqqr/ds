@@ -12,14 +12,11 @@ void Runner::Run() {
         return;
     }
 
-    std::cout << GetCurrentExecutablePath() << std::endl;
-
     // FIXME: detect Data directory
-    std::shared_ptr<VirtualFS> vfs(new VirtualFS("."));
+    std::shared_ptr<VirtualFS> vfs(new VirtualFS("../Data"));
 
     ScriptContext scriptCx{vfs};
-
-    scriptCx.ExecuteFile("../Data/Script/init.lua");
+    scriptCx.ExecuteFile("Script/init.lua");
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow* window = glfwCreateWindow(1600, 900, "ds", nullptr, nullptr);
