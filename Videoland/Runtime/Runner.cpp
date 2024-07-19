@@ -1,13 +1,13 @@
-#include <iostream>
 #include <GLFW/glfw3.h>
+#include <Videoland/FileSystem/VirtualFS.h>
+#include <Videoland/Platform/Path.h>
 #include <Videoland/Renderer/Renderer.h>
 #include <Videoland/Runtime/Runner.h>
 #include <Videoland/Script/ScriptContext.h>
-#include <Videoland/Platform/Path.h>
-#include <Videoland/FileSystem/VirtualFS.h>
+#include <iostream>
 
 namespace Videoland {
-void Runner::Run() {
+void Runner::Run(const ApplicationInfo& applicationInfo) {
     if (!glfwInit()) {
         return;
     }
@@ -19,7 +19,7 @@ void Runner::Run() {
     scriptCx.ExecuteFile("Script/init.lua");
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(1600, 900, "ds", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1600, 900, applicationInfo.productName.c_str(), nullptr, nullptr);
     if (!window) {
         return;
     }
