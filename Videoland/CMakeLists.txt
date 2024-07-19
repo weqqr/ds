@@ -5,6 +5,7 @@ add_library(Videoland STATIC
     Platform/Path.cpp
     Renderer/Renderer.cpp
     Runtime/Runner.cpp
+    Scene/Scene.cpp
     Script/ScriptContext.cpp
 )
 
