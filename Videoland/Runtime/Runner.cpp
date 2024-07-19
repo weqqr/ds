@@ -4,6 +4,7 @@
 #include <Videoland/Runtime/Runner.h>
 #include <Videoland/Script/ScriptContext.h>
 #include <Videoland/Platform/Path.h>
+#include <Videoland/FileSystem/VirtualFS.h>
 
 namespace Videoland {
 void Runner::Run() {
@@ -13,7 +14,10 @@ void Runner::Run() {
 
     std::cout << GetCurrentExecutablePath() << std::endl;
 
-    ScriptContext scriptCx{};
+    // FIXME: detect Data directory
+    std::shared_ptr<VirtualFS> vfs(new VirtualFS("."));
+
+    ScriptContext scriptCx{vfs};
 
     scriptCx.ExecuteFile("../Data/Script/init.lua");
 

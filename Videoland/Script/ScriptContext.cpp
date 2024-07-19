@@ -13,7 +13,8 @@
     }
 
 namespace Videoland {
-ScriptContext::ScriptContext() {
+ScriptContext::ScriptContext(std::shared_ptr<VirtualFS> vfs)
+    : m_vfs(vfs) {
     L = luaL_newstate();
     luaL_openlibs(L);
 }
@@ -23,13 +24,7 @@ ScriptContext::~ScriptContext() {
 }
 
 void ScriptContext::ExecuteFile(const std::string& path) {
-    std::ifstream input(path);
-    VERIFY(input.is_open());
-
-    std::stringstream buffer;
-    buffer << input.rdbuf();
-
-    std::string source = buffer.str();
+    std::string source = m_vfs->ReadToString(path);
 
     std::string chunk_name = "@" + path;
     std::string bytecode = Luau::compile(source);
