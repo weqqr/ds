@@ -1,13 +1,17 @@
+#include <iostream>
 #include <GLFW/glfw3.h>
 #include <Videoland/Renderer/Renderer.h>
 #include <Videoland/Runtime/Runner.h>
 #include <Videoland/Script/ScriptContext.h>
+#include <Videoland/Platform/Path.h>
 
 namespace Videoland {
 void Runner::Run() {
     if (!glfwInit()) {
         return;
     }
+
+    std::cout << GetCurrentExecutablePath() << std::endl;
 
     ScriptContext scriptCx{};
 

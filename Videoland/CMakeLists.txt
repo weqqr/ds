@@ -1,6 +1,8 @@
 add_library(Videoland STATIC
     Common/Verify.cpp
+    FileSystem/VirtualFS.cpp
     GPU/GPUContext.cpp
+    Platform/Path.cpp
     Renderer/Renderer.cpp
     Runtime/Runner.cpp
     Script/ScriptContext.cpp
