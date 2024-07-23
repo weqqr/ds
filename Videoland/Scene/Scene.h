@@ -1,6 +1,8 @@
 #pragma once
 
+#include <Videoland/Collections/Pool.h>
 #include <Videoland/Math/Math.h>
+#include <memory>
 
 namespace Videoland {
 class Spatial {
@@ -24,13 +26,12 @@ private:
 
 class Camera : public Spatial {
 public:
-
 private:
-
 };
 
 class SceneGraph {
 public:
 private:
+    Pool<std::unique_ptr<Spatial>> m_pool;
 };
 }
