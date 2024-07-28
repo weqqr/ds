@@ -39,7 +39,9 @@ private:
     void Destroy();
     void Recreate();
 
-    void AcquireImage();
+    size_t FrameCount() const;
+
+    SwapchainImage AcquireImage(VkSemaphore semaphore);
 
     VkDevice m_device{VK_NULL_HANDLE};
     VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
@@ -52,8 +54,10 @@ class GPUContext {
 public:
     GPUContext() = default;
     GPUContext(GLFWwindow* window);
-
     ~GPUContext();
+
+    SwapchainImage AcquireNextFrame();
+    void SubmitFrame(SwapchainImage image);
 
 private:
     VkInstance m_instance{VK_NULL_HANDLE};
@@ -63,5 +67,10 @@ private:
     VkDevice m_device{VK_NULL_HANDLE};
     VkQueue m_graphicsComputeQueue{VK_NULL_HANDLE};
     Swapchain m_swapchain{};
+    VkCommandPool m_commandPool{VK_NULL_HANDLE};
+    std::vector<VkCommandBuffer> m_frameCommandBuffers{};
+
+    std::vector<VkSemaphore> m_frameSemaphores{};
+    VkSemaphore m_currentFrameSemaphore{VK_NULL_HANDLE};
 };
 }

@@ -43,6 +43,7 @@ static VkInstance CreateInstance() {
     };
 
     VK_CHECK(vkCreateInstance(&createInfo, nullptr, &instance));
+    VERIFY(instance != VK_NULL_HANDLE);
 
     volkLoadInstance(instance);
 
@@ -77,6 +78,7 @@ static VkDebugUtilsMessengerEXT CreateDebugUtilsMessenger(VkInstance instance) {
 
     VkDebugUtilsMessengerEXT messenger{};
     VK_CHECK(vkCreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &messenger));
+    VERIFY(messenger != VK_NULL_HANDLE);
 
     return messenger;
 }
@@ -93,6 +95,7 @@ static VkSurfaceKHR CreateSurfaceWin32(VkInstance instance, GLFWwindow* window) 
 
     VkSurfaceKHR surface{};
     VK_CHECK(vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface));
+    VERIFY(surface != VK_NULL_HANDLE);
 
     return surface;
 }
@@ -145,7 +148,7 @@ Adapter SelectAdapter(VkInstance instance, VkSurfaceKHR surface) {
 
         // query surface support
         VkBool32 supportsSurface = VK_FALSE;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, adapter.graphicsComputeQueueIndex, surface, &supportsSurface);
+        VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, adapter.graphicsComputeQueueIndex, surface, &supportsSurface));
 
         VERIFY(supportsSurface == VK_TRUE);
 
@@ -188,6 +191,7 @@ static VkDevice CreateDevice(const Adapter& adapter) {
 
     VkDevice device = VK_NULL_HANDLE;
     VK_CHECK(vkCreateDevice(adapter.device, &createInfo, nullptr, &device));
+    VERIFY(device != VK_NULL_HANDLE);
 
     volkLoadDevice(device);
 
@@ -197,19 +201,60 @@ static VkDevice CreateDevice(const Adapter& adapter) {
 static SurfaceInfo QuerySurfaceInfo(const Adapter& adapter, VkSurfaceKHR surface) {
     SurfaceInfo info;
 
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(adapter.device, surface, &info.capabilities);
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(adapter.device, surface, &info.capabilities));
 
     uint32_t formatCount = 0;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(adapter.device, surface, &formatCount, nullptr);
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(adapter.device, surface, &formatCount, nullptr));
 
     VERIFY(formatCount > 0);
 
     std::vector<VkSurfaceFormatKHR> formats(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(adapter.device, surface, &formatCount, formats.data());
+    VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(adapter.device, surface, &formatCount, formats.data()));
 
     info.preferredFormat = formats[0];
 
     return info;
+}
+
+VkSemaphore CreateSemaphore(VkDevice device) {
+    VkSemaphoreCreateInfo createInfo = {
+        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+    };
+
+    VkSemaphore semaphore = VK_NULL_HANDLE;
+    VK_CHECK(vkCreateSemaphore(device, &createInfo, nullptr, &semaphore));
+    VERIFY(semaphore != VK_NULL_HANDLE);
+
+    return semaphore;
+}
+
+VkCommandPool CreateCommandPool(VkDevice device, uint32_t graphicsComputeQueueIndex) {
+    VkCommandPoolCreateInfo createInfo = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+        .queueFamilyIndex = graphicsComputeQueueIndex,
+    };
+
+    VkCommandPool commandPool = VK_NULL_HANDLE;
+    VK_CHECK(vkCreateCommandPool(device, &createInfo, nullptr, &commandPool));
+    VERIFY(commandPool != VK_NULL_HANDLE);
+
+    return commandPool;
+}
+
+VkCommandBuffer AllocateCommandBuffer(VkDevice device, VkCommandPool commandPool) {
+    VkCommandBufferAllocateInfo allocateInfo = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool = commandPool,
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1,
+    };
+
+    VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
+    vkAllocateCommandBuffers(device, &allocateInfo, &commandBuffer);
+    VERIFY(commandBuffer != VK_NULL_HANDLE);
+
+    return commandBuffer;
 }
 
 void Swapchain::Create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent, const Adapter& adapter, const SurfaceInfo& surfaceInfo) {
@@ -284,6 +329,25 @@ void Swapchain::Recreate() {
     // create();
 }
 
+size_t Swapchain::FrameCount() const {
+    return m_images.size();
+}
+
+SwapchainImage Swapchain::AcquireImage(VkSemaphore semaphore) {
+    constexpr uint64_t SWAPCHAIN_TIMEOUT = 5'000'000'000; // nanoseconds
+
+    SwapchainImage image;
+
+    VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, SWAPCHAIN_TIMEOUT, semaphore, VK_NULL_HANDLE, &image.index));
+
+    VERIFY(image.index < m_images.size());
+
+    image.image = m_images[image.index];
+    image.imageView = m_imageViews[image.index];
+
+    return image;
+}
+
 GPUContext::GPUContext(GLFWwindow* window) {
     VK_CHECK(volkInitialize());
 
@@ -304,11 +368,41 @@ GPUContext::GPUContext(GLFWwindow* window) {
     vkGetDeviceQueue(m_device, m_adapter.graphicsComputeQueueIndex, 0, &m_graphicsComputeQueue);
     SurfaceInfo surfaceInfo = QuerySurfaceInfo(m_adapter, m_surface);
     m_swapchain.Create(m_device, m_surface, window_extent, m_adapter, surfaceInfo);
+
+    m_frameSemaphores.resize(m_swapchain.FrameCount());
+    for (size_t i = 0; i < m_swapchain.FrameCount(); i++) {
+        m_frameSemaphores[i] = CreateSemaphore(m_device);
+    }
+
+    m_currentFrameSemaphore = CreateSemaphore(m_device);
+
+    m_commandPool = CreateCommandPool(m_device, m_adapter.graphicsComputeQueueIndex);
+
+    m_frameCommandBuffers.resize(m_swapchain.FrameCount());
+    for (size_t i = 0; i < m_swapchain.FrameCount(); i++) {
+        m_frameCommandBuffers[i] = AllocateCommandBuffer(m_device, m_commandPool);
+    }
 }
 
 GPUContext::~GPUContext() {
     if (!m_instance) {
         return;
+    }
+
+    for (auto commandBuffer : m_frameCommandBuffers) {
+        vkFreeCommandBuffers(m_device, m_commandPool, 1, &commandBuffer);
+    }
+
+    if (m_commandPool) {
+        vkDestroyCommandPool(m_device, m_commandPool, nullptr);
+    }
+
+    if (m_currentFrameSemaphore) {
+        vkDestroySemaphore(m_device, m_currentFrameSemaphore, nullptr);
+    }
+
+    for (auto semaphore : m_frameSemaphores) {
+        vkDestroySemaphore(m_device, semaphore, nullptr);
     }
 
     m_swapchain.Destroy();
@@ -326,5 +420,49 @@ GPUContext::~GPUContext() {
     }
 
     vkDestroyInstance(m_instance, nullptr);
+}
+
+SwapchainImage GPUContext::AcquireNextFrame() {
+    SwapchainImage frame = m_swapchain.AcquireImage(m_currentFrameSemaphore);
+
+    std::swap(m_currentFrameSemaphore, m_frameSemaphores[frame.index]);
+
+    return frame;
+}
+
+void GPUContext::SubmitFrame(SwapchainImage image) {
+    // VkResult presentResult = VK_SUCCESS;
+
+    // VkPipelineStageFlags waitDstStageMask[1] = {
+    //     VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+    // };
+
+    // VkSubmitInfo submitInfo = {
+    //     .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+    //     // .pNext = ,
+    //     .waitSemaphoreCount = 1,
+    //     .pWaitSemaphores = &m_currentFrameSemaphore,
+    //     .pWaitDstStageMask = waitDstStageMask,
+    //     .commandBufferCount = 1,
+    //     .pCommandBuffers = ,
+    //     .signalSemaphoreCount = 0,
+    //     .pSignalSemaphores = nullptr,
+    // };
+
+    // vkQueueSubmit(m_graphicsComputeQueue, 1, &submitInfo, fence);
+
+    // VkPresentInfoKHR presentInfo = {
+    //     .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+    //     .waitSemaphoreCount = 1,
+    //     .pWaitSemaphores = waitSemaphores,
+    //     .swapchainCount = 1,
+    //     .pSwapchains = &m_swapchain.m_swapchain,
+    //     .pImageIndices = &image.index,
+    //     .pResults = &presentResult,
+    // };
+
+    // vkQueuePresentKHR(m_graphicsComputeQueue, &presentInfo);
+
+    // VK_CHECK(presentResult);
 }
 }
