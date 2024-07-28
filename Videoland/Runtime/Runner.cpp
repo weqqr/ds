@@ -4,6 +4,7 @@
 #include <Videoland/Renderer/Renderer.h>
 #include <Videoland/Runtime/Runner.h>
 #include <Videoland/Script/ScriptContext.h>
+#include <Videoland/Resource/Model.h>
 #include <iostream>
 
 namespace Videoland {
