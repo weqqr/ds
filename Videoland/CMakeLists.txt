@@ -5,11 +5,12 @@ add_library(Videoland STATIC
     Platform/Path.cpp
     Renderer/Renderer.cpp
     Resource/Model.cpp
+    Resource/ShaderCompiler.cpp
     Runtime/Runner.cpp
     Scene/Scene.cpp
     Script/ScriptContext.cpp
 )
 
 target_include_directories(Videoland PUBLIC ..)
-target_link_libraries(Videoland glfw volk Luau.Compiler Luau.VM)
+target_link_libraries(Videoland glfw volk Luau.Compiler Luau.VM Slang)
 target_compile_features(Videoland PUBLIC cxx_std_23)

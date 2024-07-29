@@ -12,6 +12,17 @@ add_subdirectory(Vendor/volk)
 add_subdirectory(Vendor/glfw)
 add_subdirectory(Vendor/luau)
 
+
+set(SLANG_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Slang")
+
+add_library(Slang INTERFACE)
+target_include_directories(Slang INTERFACE ${SLANG_PATH}/include)
+target_link_libraries(Slang INTERFACE
+    # ${SLANG_PATH}/lib/gfx.lib
+    ${SLANG_PATH}/lib/slang-rt.lib
+    ${SLANG_PATH}/lib/slang.lib
+)
+
 add_subdirectory(Videoland)
 
 add_subdirectory(DS)

@@ -4,6 +4,7 @@
 #include <Videoland/Renderer/Renderer.h>
 #include <Videoland/Runtime/Runner.h>
 #include <Videoland/Script/ScriptContext.h>
+#include <Videoland/Resource/ShaderCompiler.h>
 #include <Videoland/Resource/Model.h>
 #include <iostream>
 
@@ -18,6 +19,9 @@ void Runner::Run(const ApplicationInfo& applicationInfo) {
 
     ScriptContext scriptCx{vfs};
     scriptCx.ExecuteFile("Script/init.lua");
+
+    ShaderCompiler shaderCompiler{vfs};
+    shaderCompiler.CompileShader("Shaders/World");
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow* window = glfwCreateWindow(1600, 900, applicationInfo.productName.c_str(), nullptr, nullptr);
