@@ -3,13 +3,16 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #include <Videoland/GPU/GPUContext.h>
+#include <Videoland/GPU/VulkanErrors.h>
 #include <iostream>
 #include <vector>
 
-#define VK_CHECK(result)                                                                             \
-    if ((result) != VK_SUCCESS) {                                                                    \
-        std::cout << "" << __FILE__ << ":" << __LINE__ << ": Vulkan error: " << result << std::endl; \
-        PANIC("Encountered unexpected Vulkan error");                                                \
+#define VK_CHECK(result)                                            \
+    if ((result) != VK_SUCCESS) {                                   \
+        std::cout << "Vulkan error at " __FILE__ << ":" << __LINE__ \
+                  << ": VkResult=" << vkResultToString(result)      \
+                  << std::endl;                                     \
+        PANIC("Encountered unexpected Vulkan error");               \
     }
 
 namespace Videoland {

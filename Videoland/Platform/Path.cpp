@@ -27,3 +27,4 @@ std::string GetCurrentExecutablePath() {
 }
 #endif
 }
+

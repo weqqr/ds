@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Videoland/Common/NoCopy.h>
 #include <GLFW/glfw3.h>
+#include <Videoland/Common/NoCopy.h>
 #include <string>
 #include <vector>
 #include <volk.h>
@@ -35,7 +35,7 @@ public:
     Swapchain() = default;
 
 private:
-    void Create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent, const Adapter &adapter, const SurfaceInfo& surface_info);
+    void Create(VkDevice device, VkSurfaceKHR surface, VkExtent2D extent, const Adapter& adapter, const SurfaceInfo& surface_info);
     void Destroy();
     void Recreate();
 

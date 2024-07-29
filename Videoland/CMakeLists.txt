@@ -2,6 +2,7 @@ add_library(Videoland STATIC
     Common/Verify.cpp
     FileSystem/VirtualFS.cpp
     GPU/GPUContext.cpp
+    GPU/VulkanErrors.cpp
     Platform/Path.cpp
     Renderer/Renderer.cpp
     Resource/Model.cpp
