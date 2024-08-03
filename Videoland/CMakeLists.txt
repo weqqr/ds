@@ -1,12 +1,12 @@
 add_library(Videoland STATIC
     Common/Verify.cpp
+    Content/Model.cpp
+    Content/ShaderCompiler.cpp
     FileSystem/VirtualFS.cpp
     GPU/GPUContext.cpp
     GPU/VulkanErrors.cpp
     Platform/Path.cpp
     Renderer/Renderer.cpp
-    Resource/Model.cpp
-    Resource/ShaderCompiler.cpp
     Runtime/Runner.cpp
     Scene/Scene.cpp
     Script/ScriptContext.cpp

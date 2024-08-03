@@ -1,4 +1,4 @@
-#include <Videoland/Resource/Model.h>
+#include <Videoland/Content/Model.h>
 
 namespace Videoland {
 std::expected<Model, int> Model::Load(const std::string& path) {

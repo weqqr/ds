@@ -7,7 +7,6 @@ Renderer::Renderer(GLFWwindow* window)
 void Renderer::RenderFrame() {
     SwapchainImage frame = m_context.AcquireNextFrame();
 
-
     m_context.SubmitFrame(frame);
 }
 }

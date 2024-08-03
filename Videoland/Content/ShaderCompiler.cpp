@@ -1,5 +1,5 @@
 #include <Videoland/Common/Verify.h>
-#include <Videoland/Resource/ShaderCompiler.h>
+#include <Videoland/Content/ShaderCompiler.h>
 #include <iostream>
 #include <slang-com-ptr.h>
 #include <slang.h>

@@ -1,11 +1,11 @@
 #include <GLFW/glfw3.h>
+#include <Videoland/Content/Model.h>
+#include <Videoland/Content/ShaderCompiler.h>
 #include <Videoland/FileSystem/VirtualFS.h>
 #include <Videoland/Platform/Path.h>
 #include <Videoland/Renderer/Renderer.h>
 #include <Videoland/Runtime/Runner.h>
 #include <Videoland/Script/ScriptContext.h>
-#include <Videoland/Resource/ShaderCompiler.h>
-#include <Videoland/Resource/Model.h>
 #include <iostream>
 
 namespace Videoland {
