@@ -1,8 +1,12 @@
+#if defined(_WIN32)
 #include <Shlwapi.h>
+#endif
+
 #include <Videoland/Common/Verify.h>
 #include <Videoland/Platform/Path.h>
 
 namespace Videoland {
+#if defined(_WIN32)
 static std::string wideToNarrow(WCHAR* wideString, int wideLength) {
     int narrowSize = WideCharToMultiByte(CP_UTF8, 0, wideString, wideLength, NULL, 0, NULL, NULL);
 
@@ -14,7 +18,6 @@ static std::string wideToNarrow(WCHAR* wideString, int wideLength) {
     return narrow;
 }
 
-#if defined(_WIN32)
 std::string GetCurrentExecutablePath() {
     constexpr DWORD maxPathSize = 2048;
 
@@ -25,6 +28,8 @@ std::string GetCurrentExecutablePath() {
 
     return wideToNarrow(path, length);
 }
+#else
+#error unsupported platform
 #endif
 }
 
